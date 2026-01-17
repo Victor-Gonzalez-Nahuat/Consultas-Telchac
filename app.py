@@ -12,6 +12,7 @@ load_dotenv()
 API_URL = os.getenv("API_URL")
 ZONA_HORARIA = pytz.timezone("America/Merida")
 
+
 # --- Utilidades ---
 def fmt_to_api(date_str):
     if not date_str: return None
