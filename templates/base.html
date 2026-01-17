@@ -129,6 +129,29 @@
             border-left: 4px solid #6c757d !important;
         }
 
+                /* Clase para ocultar elementos según la vista seleccionada */
+        .view-hidden {
+            display: none !important;
+        }
+
+        /* Estilo para la tabla densa */
+        .table-dense {
+            font-size: 0.85rem;
+        }
+        .table-dense th {
+            background-color: var(--gob-gris);
+            color: var(--gob-guinda);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+        }
+
+
+        /* Agrega esto a tu bloque <style> */
+        .container-full-width {
+            max-width: 95% !important; /* Aprovecha casi todo el ancho pero deja un pequeño margen */
+            transition: max-width 0.3s ease-in-out;
+        }
+
         #btn-back-to-top {
             position: fixed;
             bottom: 20px;
