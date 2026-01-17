@@ -14,10 +14,33 @@
             --gob-gris: #F8F9FA;
         }
 
+                /* Esto obliga al body a ocupar todo el alto de la pantalla */
+        html, body {
+            height: 100%;
+        }
+
         body {
+            display: flex;
+            flex-direction: column;
             font-family: 'Open Sans', sans-serif;
             background-color: #f4f4f4;
             color: #333;
+        }
+
+        /* El main crecerá para empujar al footer hacia abajo */
+        main {
+            flex: 1 0 auto;
+        }
+
+        footer {
+            flex-shrink: 0;
+        }
+
+        /* Ajuste para que en pantallas MUY grandes no se vea infinito */
+        @media (min-width: 1400px) {
+            .container {
+                max-width: 1140px; /* Evita que las cards se estiren demasiado en monitores gigantes */
+            }
         }
 
         h1, h2, h3, .navbar-brand {
@@ -160,7 +183,7 @@
 
     <footer class="mt-5 py-4 bg-dark text-white text-center">
         <div class="container">
-            <p class="small mb-0">&copy; 2026 H. Ayuntamiento de Telchac Puerto. Todos los derechos reservados.</p>
+            <p class="small mb-0">&copy; 2026 H. Ayuntamiento de Telchac Puerto.</p>
         </div>
     </footer>
 

@@ -39,16 +39,17 @@
                 </div>
                 
             </div>
-            <a href="{{ API_URL }}cedulas/reporte?desde={{ api_desde }}&hasta={{ api_hasta }}{% if contribuyente %}&contribuyente={{ contribuyente|urlencode }}{% endif %}" 
-                   target="_blank" class="btn btn-outline-danger" style="width: 100%;">
-                   Descargar PDF
+            <div class="d-flex justify-content-end mt-2">
+                <a href="{{ API_URL }}cedulas/reporte?desde={{ api_desde }}&hasta={{ api_hasta }}{% if contribuyente %}&contribuyente={{ contribuyente|urlencode }}{% endif %}" class="btn btn-outline-danger d-flex align-items-center gap-2">
+                    Descargar PDF
                 </a>
+            </div>
         </div>
     </div>
 
     <div class="row">
         {% for c in cedulas %}
-        <div class="col-md-6 mb-3">
+        <div class="col-md-6 col-lg-4 mb-3">
             <div class="card p-3">
                 <div class="d-flex justify-content-between border-bottom pb-2 mb-2">
                     <h6 class="fw-bold m-0" style="color: #10312B;">Folio: {{ c.folio }}</h6>
