@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="header-custom bg-recibos container-fluid mb-4">
+    <div class="container">
+        <div class="d-flex align-items-center gap-3 mb-3">
+            <h1 class="h3 m-0 text-white">Consulta de Recibos</h1>
+        </div>
+        
+        <form action="/" method="GET" class="row g-3 align-items-end">
+            
+            <div class="col-6 col-md-2">
+                <label class="small text-white-50">Desde:</label>
+                <input type="date" name="desde" class="form-control" value="{{ desde }}">
+            </div>
+
+            <div class="col-6 col-md-2">
+                <label class="small text-white-50">Hasta:</label>
+                <input type="date" name="hasta" class="form-control" value="{{ hasta }}">
+            </div>
+
+            <div class="col-12 col-md-4">
+                <label class="small text-white-50">Contribuyente:</label>
+                <input type="text" name="contribuyente" class="form-control" value="{{ contribuyente }}" placeholder="Nombre opcional...">
+            </div>
+
+            <div class="col-12 col-md-4">
+                <div class="row g-2">
+                    <div class="col-6 col-md-4">
+                        <button type="submit" class="btn btn-success w-100 fw-bold">Buscar</button>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <button type="button" class="btn w-100 text-white fw-bold" style="background-color: var(--gob-dorado);" onclick="cargarResumen()">Resumen</button>
+                    </div>
+                    
+                    <div class="col-12 col-md-4">
+                        <a href="/" class="btn btn-outline-light w-100">Ir a Hoy</a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card p-3">
+                <h5>Total Neto: <span class="text-success">${{ "{:,.2f}".format(totales.total_neto|float) }}</span></h5>
+                <h6>Total Descuento: <span>${{ "{:,.2f}".format(totales.total_descuento|float) }}</span></h6>
+
+                <p class="m-0 text-muted small">Recibos: {{ recibos|length }} | <span style="color: red;">Cancelados: {{ totales.cantidad_status_1 }}</span></p>
+            </div>
+            <a href="{{ API_URL }}recibos/reporte?desde={{ api_desde }}&hasta={{ api_hasta }}{% if contribuyente %}&contribuyente={{ contribuyente|urlencode }}{% endif %}" 
+            target="_blank" 
+            class="btn btn-outline-danger d-flex align-items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-pdf" viewBox="0 0 16 16">
+                <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h4v2z"/>
+                <path d="M4.603 12.087a.8.8 0 0 1-.438-.42c-.195-.406-.139-.902.132-1.27.31-.422.8-.76 1.307-1.039l.115-.062c.113-.061.22-.116.324-.166.425-.205.807-.406 1.096-.653.298-.255.485-.541.564-.852.126-.497.042-1.01-.223-1.396-.282-.41-.716-.583-1.127-.583-.715 0-1.246.471-1.36 1.155-.02.12-.023.23-.016.331.026.353.118.66.257.915l.231.42-.09.123c-.15.205-.333.393-.526.56-.347.29-.757.54-1.196.713-.44.173-.913.264-1.37.264a1.7 1.7 0 0 1-.462-.061m6.035-4.178c.028-.052.05-.107.067-.164.085-.286.082-.572.03-.844l-.013-.062c-.015-.074-.035-.148-.061-.22-.142-.397-.435-.634-.827-.634-.44 0-.756.312-.888.667-.14.375-.125.795.042 1.161.166.365.488.583.91.583.178 0 .343-.037.478-.108z"/>
+                </svg>
+                Descargar PDF
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        {% for r in recibos %}
+        {% set es_cancelado = r.status == "1" or r.id_status == "1" %}
+        <div class="col-md-6 mb-3">
+            <div class="card p-3 {{ 'opacity-50 border-cancelado' if es_cancelado else 'border-pagado' }}">
+                
+                <div class="d-flex justify-content-between border-bottom pb-2 mb-2">
+                    <h6 class="fw-bold m-0" style="color: var(--gob-guinda);">Recibo: {{ r.recibo }}</h6>
+                    {% if es_cancelado %}
+                        <span class="badge bg-danger">❌ CANCELADO</span>
+                    {% else %}
+                        <span class="badge bg-light text-dark">Folio Digital</span>
+                    {% endif %}
+                </div>
+                
+                <p class="mb-1"><strong>Contribuyente:</strong> {{ r.contribuyente }}</p>
+                <p class="mb-1 text-muted small"><strong>Concepto:</strong> {{ r.concepto }}</p>
+                
+                <div class="row mt-2 bg-light p-2 rounded mx-0">
+                    <div class="col-6">
+                        <small class="d-block text-muted text-uppercase" style="font-size: 0.7rem;">Fecha</small>
+                        <span>{{ fmt_fecha(r.fecha) }}</span>
+                    </div>
+                    <div class="col-6 text-end">
+                        <small class="d-block text-muted text-uppercase" style="font-size: 0.7rem;">Monto Neto</small>
+                        <span class="fw-bold {{ 'text-success' if not es_cancelado else 'text-muted' }}" style="font-size: 1.1rem;">
+                            ${{ "{:,.2f}".format(r.neto|float) }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="mt-3 pt-2 border-top">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="m-0 small"><strong>Forma de Pago:</strong> {{ r.forma_pago }}</p>
+                            <p class="m-0 text-danger" style="font-size: 0.8rem;">
+                                <strong>Descuento:</strong> ${{ "{:,.2f}".format(r.descuento|float) }} ({{ r.porcentaje_descuento }}%)
+                            </p>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="col-12 text-center py-5">
+            <h5 class="text-muted">No se encontraron recibos en este periodo.</h5>
+        </div>
+    {% endfor %}
+    </div>
+</div>
+
+<div class="modal fade" id="resumenModal" tabindex="-1" aria-labelledby="resumenModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content" style="border-left: 5px solid var(--gob-dorado);">
+      <div class="modal-header" style="background-color: var(--gob-guinda); color: white;">
+        <h5 class="modal-title" id="resumenModalLabel">Despliegue de Totales</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="modal-body-content">
+        <div class="text-center">
+            <div class="spinner-border text-danger" role="status"></div>
+            <p>Cargando datos...</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function cargarResumen() {
+    // 1. Mostrar el modal
+    const myModal = new bootstrap.Modal(document.getElementById('resumenModal'));
+    myModal.show();
+    
+    const content = document.getElementById('modal-body-content');
+    content.innerHTML = '<div class="text-center"><div class="spinner-border text-danger"></div><p>Consultando...</p></div>';
+
+    // 2. Obtener fechas de los inputs actuales
+    const desde = document.querySelector('input[name="desde"]').value;
+    const hasta = document.querySelector('input[name="hasta"]').value;
+
+    // 3. Llamar a nuestra ruta de Flask
+    fetch(`/obtener_resumen?desde=${desde}&hasta=${hasta}`)
+        .then(response => response.json())
+        .then(res => {
+            if (res.status === 'success') {
+                let html = '<div class="list-group list-group-flush">';
+                res.data.forEach(item => {
+                    html += `
+                        <div class="list-group-item">
+                            <h6 class="fw-bold text-uppercase" style="color: var(--gob-guinda);">${item.cuenta || 'Sin cuenta'}</h6>
+                            <div class="d-flex justify-content-between">
+                                <span>Total Neto:</span>
+                                <span class="fw-bold text-success">$${parseFloat(item.total_neto).toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
+                            </div>
+                            <div class="d-flex justify-content-between text-muted small">
+                                <span>Total Descuento:</span>
+                                <span>$${parseFloat(item.total_descuento).toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
+                            </div>
+                        </div>`;
+                });
+                html += '</div>';
+                content.innerHTML = html;
+            } else {
+                content.innerHTML = `<div class="alert alert-warning">${res.message}</div>`;
+            }
+        })
+        .catch(err => {
+            content.innerHTML = `<div class="alert alert-danger">Error de conexión: ${err}</div>`;
+        });
+}
+</script>
+{% endblock %} 
+
