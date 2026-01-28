@@ -38,6 +38,7 @@ def index():
     endpoint = "recibos/filtrar" if contribuyente else "recibos"
     try:
         r_res = requests.get(f"{API_URL}{endpoint}", params=params)
+        r_res.encoding = 'utf-8'
         r_data = r_res.json() if r_res.status_code == 200 else []
     except Exception:
         r_data = []

@@ -38,7 +38,7 @@
                 res.data.forEach(item => {
                     html += `
                         <div class="list-group-item">
-                            <h6 class="fw-bold text-uppercase" style="color: var(--gob-guinda);">${item.cuenta || 'Sin cuenta'}</h6>
+                            <h6 class="fw-bold text-uppercase" style="color: var(--gob-guinda);">${item.cuenta || 'Sin cuenta'} (${item.cantidad_recibos || '0'})</h6>
                             <div class="d-flex justify-content-between">
                                 <span>Total Neto:</span>
                                 <span class="fw-bold text-success">$${parseFloat(item.total_neto).toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
